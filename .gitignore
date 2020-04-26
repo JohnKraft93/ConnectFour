@@ -11,7 +11,8 @@
 .mtj.tmp/
 
 # Package Files #
-*.netbeans
+*.netbeans_automatic_build
+*.netbeans_update_resources
 *.mf
 *.properties
 *.xml

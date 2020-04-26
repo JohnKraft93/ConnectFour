@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 
@@ -17,7 +14,7 @@ public class Model {
 
     public synchronized Integer validMove(ClientHandler player, int col){
         if(player == CurrentPlayer){
-            for(int i = 5; i > 0; i--){
+            for(int i = 5; i >= 0; i--){
                 if(grid[i][col] == 0){
                     System.out.println("valid move");
                     grid[i][col] = Integer.parseInt(player.player);
@@ -26,7 +23,6 @@ public class Model {
                     return i;
                 }
             }
-            //check for full column but not now
         }
         return -1;
     }
@@ -53,7 +49,6 @@ class ClientHandler extends Thread {
             out.flush();
             System.out.println("YOO");
         } catch (IOException e){}
-        
     }
     
     public void setOpponent(ClientHandler op){
@@ -69,7 +64,6 @@ class ClientHandler extends Thread {
     @Override
     public void run() {
         while(true){
-            System.out.println("waiting");
             if(this == model.CurrentPlayer){
                 System.out.println("server> waiting for client " +
                                 player + " to send data..");

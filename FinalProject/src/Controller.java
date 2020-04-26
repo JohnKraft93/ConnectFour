@@ -7,7 +7,6 @@ public class Controller {
     private BufferedReader inn;
     private Socket clientSocket;
     private View view;
-    private int col;
     
     public Controller(){
         view = new View();
@@ -19,10 +18,8 @@ public class Controller {
         } catch (IOException e){
             e.printStackTrace();
         }
-        //view.setAddButtonAction(new)
         view.setAddButtonActionListner(new ButtonActionListeners());
         view.setWindowListener(new myWindowListener(out, inn, clientSocket));
-        
         beginGame();
     }
     
@@ -32,6 +29,7 @@ public class Controller {
             response = inn.readLine();
             if(response.startsWith("1")){
                 //enable buttons
+                view.enableButtonActionListeners();
                 System.out.println(response);
                 view.setTitle(response);
             } else if (response.startsWith("2")){
@@ -44,6 +42,7 @@ public class Controller {
                 if(response.startsWith("VALID")) {
                     System.out.println(response);
                     //disable buttons
+                    view.disableButtonActionListeners();
                     view.setBoard(Integer.parseInt(response.substring(6, 7)),
                             Integer.parseInt(response.substring(7, 8)),
                             Integer.parseInt(response.substring(8, 9)));
@@ -51,6 +50,8 @@ public class Controller {
                 } else if(response.startsWith("OPPONENT")) {
                     System.out.println(response);
                     //enable buttons
+                    view.disableButtonActionListeners();
+                    view.enableButtonActionListeners();
                     System.out.println("OPPONENT");
                     System.out.println(response);
                     view.setBoard(Integer.parseInt(response.substring(9, 10)),
@@ -67,7 +68,6 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println("client> send request to server: " + e.getActionCommand());
-            col = Integer.parseInt(e.getActionCommand());
             out.println("MOVE " + e.getActionCommand());
             out.flush(); 
         }
