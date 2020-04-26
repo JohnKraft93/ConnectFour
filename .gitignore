@@ -11,6 +11,10 @@
 .mtj.tmp/
 
 # Package Files #
+*.netbeans
+*.mf
+*.properties
+*.xml
 *.jar
 *.war
 *.nar
