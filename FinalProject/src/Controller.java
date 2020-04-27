@@ -27,10 +27,6 @@ public class Controller {
     public final void beginGame(){
         String response;
         try { 
-            response = inn.readLine();
-            if(response.startsWith("1") || response.startsWith("2")){
-                                
-            }
             while(true) {
                 response = inn.readLine();
                 if(response.startsWith("BEGIN")){

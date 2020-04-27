@@ -48,9 +48,7 @@ public class Model {
                 return true;
             }            
         }
-        
-        
-            
+  
         //check for diagonal winner
         
         return false;
@@ -72,9 +70,7 @@ class ClientHandler extends Thread {
         
         try {
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            out = new PrintWriter(conn.getOutputStream(), true);
-            out.println(player);
-            out.flush();            
+            out = new PrintWriter(conn.getOutputStream(), true);           
         } catch (IOException e){}
     }
     
@@ -93,18 +89,29 @@ class ClientHandler extends Thread {
                 out.println("MESS " + "Waiting for another player to connect...");
                 out.flush();
         }
-        while(opponent == null){}
+        
+        while(opponent == null){
+            Thread.yield();
+        }
+        
         out.println("BEGIN " + player);
         out.flush();
+        //messageConnection();
         bothConnected();
+    }
+    
+    public void messageConnection(){
+        out.println("MESS " + "Opponent has connected. Player \n" 
+                + model.CurrentPlayer.player + " is up first.");
+        out.flush();
     }
     
     public void bothConnected() {
         while(true){
-            System.out.println(""); //For some reason I need this empty print statement
+            Thread.yield();
             if(this == model.CurrentPlayer){
-                System.out.println("server> waiting for client " +
-                                player + " to send data..");
+                //System.out.println("server> waiting for client " +
+                //                player + " to send data..");
                 String pos;
                 try {
                     if((pos = reader.readLine()) != null) {
@@ -114,20 +121,21 @@ class ClientHandler extends Thread {
                             System.out.println(col);
                             int row;
                             if((row = model.validMove(this, col)) != -1) {
+                                model.CurrentPlayer.OpponentMoved(col, row);
+                                out.println("VALID " + row + col + player);
+                                out.flush();
                                 if(model.CheckforWinner(this, row, col)){
                                     out.println("WINNER " + player);
                                     out.flush();
                                     opponent.out.println("WINNER " + player);
                                     out.flush();
-                                } else { 
-                                    model.CurrentPlayer.OpponentMoved(col, row);
-                                    out.println("VALID " + row + col + player);
-                                    out.flush();
                                 }
                             }
                         }
                     }
-                } catch (IOException ex) {}
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
