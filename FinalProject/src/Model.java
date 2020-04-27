@@ -3,7 +3,9 @@ import java.net.Socket;
 import java.util.Arrays;
 
 public class Model {
-    Integer[][] grid = new Integer[6][7]; 
+    int maxCol = 7;
+    int maxRow = 6;
+    Integer[][] grid = new Integer[maxRow][maxCol]; 
     ClientHandler CurrentPlayer;
     
     public Model() {
@@ -14,17 +16,44 @@ public class Model {
 
     public synchronized Integer validMove(ClientHandler player, int col){
         if(player == CurrentPlayer){
-            for(int i = 5; i >= 0; i--){
+            for(int i = maxRow-1; i >= 0; i--){
                 if(grid[i][col] == 0){
                     System.out.println("valid move");
                     grid[i][col] = Integer.parseInt(player.player);
                     CurrentPlayer = CurrentPlayer.opponent;
-                    CurrentPlayer.OpponentMoved(col, i);
                     return i;
                 }
             }
         }
         return -1;
+    }
+    
+    public boolean CheckforWinner(ClientHandler player, int row, int col) {
+        int count = 0;
+        //check for horizontal winner
+        for(int i = 0; i < maxCol; i++){
+            if(grid[row][i]==Integer.parseInt(player.player)){
+                count++;
+            } else { count = 0;}
+            if(count >= 4){
+                return true;
+            }            
+        }
+        //check for vertical winner
+        for(int i = 0; i < maxRow; i++){
+            if(grid[i][col]==Integer.parseInt(player.player)){
+                count++;
+            } else { count = 0;}
+            if(count >= 4){
+                return true;
+            }            
+        }
+        
+        
+            
+        //check for diagonal winner
+        
+        return false;
     }
 }
 
@@ -45,9 +74,7 @@ class ClientHandler extends Thread {
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             out = new PrintWriter(conn.getOutputStream(), true);
             out.println(player);
-            out.flush();
-            out.flush();
-            System.out.println("YOO");
+            out.flush();            
         } catch (IOException e){}
     }
     
@@ -56,14 +83,25 @@ class ClientHandler extends Thread {
     }
     
     public void OpponentMoved(int col, int row){
-        System.out.println("opponentmoved");
         out.println("OPPONENT " + row + col + opponent.player);
         out.flush();
     }
     
     @Override
     public void run() {
+        if(opponent == null){
+                out.println("MESS " + "Waiting for another player to connect...");
+                out.flush();
+        }
+        while(opponent == null){}
+        out.println("BEGIN " + player);
+        out.flush();
+        bothConnected();
+    }
+    
+    public void bothConnected() {
         while(true){
+            System.out.println(""); //For some reason I need this empty print statement
             if(this == model.CurrentPlayer){
                 System.out.println("server> waiting for client " +
                                 player + " to send data..");
@@ -76,9 +114,16 @@ class ClientHandler extends Thread {
                             System.out.println(col);
                             int row;
                             if((row = model.validMove(this, col)) != -1) {
-                                System.out.println("PASS THrough valid move");
-                                out.println("VALID " + row + col + player);
-                                out.flush();
+                                if(model.CheckforWinner(this, row, col)){
+                                    out.println("WINNER " + player);
+                                    out.flush();
+                                    opponent.out.println("WINNER " + player);
+                                    out.flush();
+                                } else { 
+                                    model.CurrentPlayer.OpponentMoved(col, row);
+                                    out.println("VALID " + row + col + player);
+                                    out.flush();
+                                }
                             }
                         }
                     }

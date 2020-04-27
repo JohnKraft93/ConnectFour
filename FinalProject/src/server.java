@@ -16,7 +16,7 @@ public class server {
             player1.setOpponent(player2);
             player2.setOpponent(player1);
             model.CurrentPlayer = player1;
-            player1.start();
+            player1.start();            
             player2.start();
                 
             
@@ -24,5 +24,4 @@ public class server {
             e.printStackTrace();
         }
     }
-    
 }

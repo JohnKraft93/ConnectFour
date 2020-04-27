@@ -10,13 +10,16 @@ public class View {
     private final int numOfButtons = 7;
     private final JPanel buttPanel;
     public Integer board[][];
+    private final JList list;
+    private final DefaultListModel listModel;
     private final DrawPanel drawPanel;
     
     public View(){
         frame = new JFrame("Connect Four");
         buttons = new JButton[numOfButtons];
         buttPanel = new JPanel();
-               
+        listModel = new DefaultListModel();
+        list = new JList(listModel);
         board = new Integer[6][7];
         
         for(Integer[] row: board){
@@ -28,8 +31,8 @@ public class View {
             buttPanel.add(buttons[i]);
         }
         drawPanel = new DrawPanel();
-        frame.setSize(665, 600);
-        //frame.getContentPane().add(BorderLayout.NORTH, title);
+        frame.setSize(800, 600);
+        frame.getContentPane().add(BorderLayout.EAST, list);
         frame.getContentPane().add(BorderLayout.CENTER, drawPanel);
         frame.getContentPane().add(BorderLayout.SOUTH, buttPanel);
         frame.setVisible(true);
@@ -48,9 +51,6 @@ public class View {
     
     public void setBoard(int row, int col, int player){
         board[row][col] = player;
-        for(Integer[] x: board){
-            System.out.println(Arrays.toString(x));
-        }
     }
     
     public void disableButtonActionListeners() {
@@ -65,9 +65,17 @@ public class View {
         }
     }
     
+    public void addListData(String item){
+        listModel.addElement(item);
+    }
+    
     public void setTitle(String s){
-        frame.setTitle(s);
+        frame.setTitle("Player " + s);
         frame.repaint();
+    }
+    
+    public void declareWinner(){
+        
     }
     
     public class DrawPanel extends JPanel {

@@ -20,6 +20,7 @@ public class Controller {
         }
         view.setAddButtonActionListner(new ButtonActionListeners());
         view.setWindowListener(new myWindowListener(out, inn, clientSocket));
+        view.disableButtonActionListeners();
         beginGame();
     }
     
@@ -27,18 +28,21 @@ public class Controller {
         String response;
         try { 
             response = inn.readLine();
-            if(response.startsWith("1")){
-                //enable buttons
-                view.enableButtonActionListeners();
-                System.out.println(response);
-                view.setTitle(response);
-            } else if (response.startsWith("2")){
-                //disable buttons
-                System.out.println(response);
-                view.setTitle(response);                
+            if(response.startsWith("1") || response.startsWith("2")){
+                                
             }
             while(true) {
                 response = inn.readLine();
+                if(response.startsWith("BEGIN")){
+                    System.out.println(response);
+                    String player = response.substring(6);
+                    view.setTitle(player);
+                    if(player.equals("1")){
+                        view.enableButtonActionListeners();
+                    } else if(player.equals("2")){
+                        view.disableButtonActionListeners();
+                    }
+                }
                 if(response.startsWith("VALID")) {
                     System.out.println(response);
                     //disable buttons
@@ -50,7 +54,6 @@ public class Controller {
                 } else if(response.startsWith("OPPONENT")) {
                     System.out.println(response);
                     //enable buttons
-                    view.disableButtonActionListeners();
                     view.enableButtonActionListeners();
                     System.out.println("OPPONENT");
                     System.out.println(response);
@@ -58,6 +61,11 @@ public class Controller {
                             Integer.parseInt(response.substring(10, 11)), 
                             Integer.parseInt(response.substring(11, 12)));
                     view.paint();
+                } else if (response.startsWith("WINNER")){
+                    view.disableButtonActionListeners();
+                    view.addListData("Player " + response.substring(7) + " WON!");
+                } else if (response.startsWith("MESS")){
+                    view.addListData(response.substring(5));
                 }
             }
         } catch (IOException e) {}
