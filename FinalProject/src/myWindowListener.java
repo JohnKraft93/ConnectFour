@@ -1,9 +1,7 @@
-
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -11,7 +9,7 @@ public class myWindowListener implements WindowListener {
     
     private final PrintWriter out;
     private final BufferedReader inn;
-    private Socket clientSocket;
+    private final Socket clientSocket;
     
     public myWindowListener(PrintWriter out, BufferedReader inn,
             Socket clientSocket) {
@@ -24,6 +22,8 @@ public class myWindowListener implements WindowListener {
     public void windowOpened(WindowEvent e) {}
     @Override
     public void windowClosing(WindowEvent e) {
+            out.println("EXIT");
+            out.flush();
 
         try{
             out.close();
@@ -33,8 +33,8 @@ public class myWindowListener implements WindowListener {
         } catch (IOException io){
             io.printStackTrace();
         } 
-
     }
+    
     @Override
     public void windowClosed(WindowEvent e) {}
     @Override

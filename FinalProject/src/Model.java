@@ -1,26 +1,31 @@
-import java.io.*;
-import java.net.Socket;
 import java.util.Arrays;
 
 public class Model {
-    int maxCol = 7;
-    int maxRow = 6;
-    Integer[][] grid = new Integer[maxRow][maxCol]; 
-    ClientHandler CurrentPlayer;
+    private final int maxCol = 7;
+    private final int maxRow = 6;
+    private final Integer[][] grid = new Integer[maxRow][maxCol]; 
+    private ClientHandler CurrentPlayer;
     
     public Model() {
         for(Integer[] row: grid) {
             Arrays.fill(row, 0);
         }
     }
+    
+    public ClientHandler getCurrentPlayer() {
+        return CurrentPlayer;
+    }
+    
+    public void setCurrentPlayer(ClientHandler ch) {
+        this.CurrentPlayer = ch;
+    }
 
-    public synchronized Integer validMove(ClientHandler player, int col){
+    public synchronized Integer validMove(ClientHandler player, int col) {
         if(player == CurrentPlayer){
-            for(int i = maxRow-1; i >= 0; i--){
+            for(int i = maxRow-1; i >= 0; i--) {
                 if(grid[i][col] == 0){
-                    System.out.println("valid move");
-                    grid[i][col] = Integer.parseInt(player.player);
-                    CurrentPlayer = CurrentPlayer.opponent;
+                    grid[i][col] = Integer.parseInt(player.getPlayer());
+                    CurrentPlayer = CurrentPlayer.getOpponent();
                     return i;
                 }
             }
@@ -30,114 +35,48 @@ public class Model {
     
     public boolean CheckforWinner(ClientHandler player, int row, int col) {
         int count = 0;
-        //check for horizontal winner
+        
         for(int i = 0; i < maxCol; i++){
-            if(grid[row][i]==Integer.parseInt(player.player)){
+            if(grid[row][i]==Integer.parseInt(player.getPlayer())){
                 count++;
             } else { count = 0;}
             if(count >= 4){
                 return true;
             }            
         }
-        //check for vertical winner
-        for(int i = 0; i < maxRow; i++){
-            if(grid[i][col]==Integer.parseInt(player.player)){
-                count++;
-            } else { count = 0;}
-            if(count >= 4){
-                return true;
-            }            
-        }
-  
-        //check for diagonal winner
-        
-        return false;
-    }
-}
 
-class ClientHandler extends Thread {
-    Socket conn;
-    PrintWriter out;
-    BufferedReader reader;
-    Model model;
-    ClientHandler opponent;
-    String player;
-    
-    public ClientHandler(Socket conn, String player, Model model){
-        this.conn = conn;
-        this.player = player;
-        this.model = model;
-        
-        try {
-            reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            out = new PrintWriter(conn.getOutputStream(), true);           
-        } catch (IOException e){}
-    }
-    
-    public void setOpponent(ClientHandler op){
-        this.opponent = op;
-    }
-    
-    public void OpponentMoved(int col, int row){
-        out.println("OPPONENT " + row + col + opponent.player);
-        out.flush();
-    }
-    
-    @Override
-    public void run() {
-        if(opponent == null){
-                out.println("MESS " + "Waiting for another player to connect...");
-                out.flush();
+        for(int i = 0; i < maxRow; i++){
+            if(grid[i][col]==Integer.parseInt(player.getPlayer())){
+                count++;
+            } else { count = 0;}
+            if(count >= 4){
+                return true;
+            }            
         }
         
-        while(opponent == null){
-            Thread.yield();
-        }
-        
-        out.println("BEGIN " + player);
-        out.flush();
-        //messageConnection();
-        bothConnected();
-    }
-    
-    public void messageConnection(){
-        out.println("MESS " + "Opponent has connected. Player \n" 
-                + model.CurrentPlayer.player + " is up first.");
-        out.flush();
-    }
-    
-    public void bothConnected() {
-        while(true){
-            Thread.yield();
-            if(this == model.CurrentPlayer){
-                //System.out.println("server> waiting for client " +
-                //                player + " to send data..");
-                String pos;
-                try {
-                    if((pos = reader.readLine()) != null) {
-                        System.out.println(pos);
-                        if(pos.startsWith("MOVE")){
-                            int col = Integer.parseInt(pos.substring(5));
-                            System.out.println(col);
-                            int row;
-                            if((row = model.validMove(this, col)) != -1) {
-                                model.CurrentPlayer.OpponentMoved(col, row);
-                                out.println("VALID " + row + col + player);
-                                out.flush();
-                                if(model.CheckforWinner(this, row, col)){
-                                    out.println("WINNER " + player);
-                                    out.flush();
-                                    opponent.out.println("WINNER " + player);
-                                    out.flush();
-                                }
-                            }
-                        }
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+        for (int tempRow = 0; tempRow < maxRow - 3; tempRow++){
+            for (int tempCol = 0; tempCol < maxCol - 3; tempCol++){                
+                if  (!grid[tempRow][tempCol].equals(0) && 
+                     grid[tempRow][tempCol].equals(grid[tempRow+1][tempCol+1]) && 
+                     grid[tempRow][tempCol].equals(grid[tempRow+2][tempCol+2]) &&
+                     grid[tempRow][tempCol].equals(grid[tempRow+3][tempCol+3])) {
+                    
+                    return true;
                 }
             }
         }
+        
+        for (int tempRow = 0; tempRow < maxRow - 3; tempRow++){
+            for (int tempCol = 3; tempCol < maxCol; tempCol++){
+                if  (!grid[tempRow][tempCol].equals(0) && 
+                     grid[tempRow][tempCol].equals(grid[tempRow+1][tempCol-1]) && 
+                     grid[tempRow][tempCol].equals(grid[tempRow+2][tempCol-2]) &&
+                     grid[tempRow][tempCol].equals(grid[tempRow+3][tempCol-3])){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
-
 }

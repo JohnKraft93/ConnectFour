@@ -27,16 +27,16 @@ public class View {
         }
         
         for (int i = 0; i < numOfButtons; i++){
-            buttons[i] = new JButton(Integer.toString(i));
+            buttons[i] = new JButton(Integer.toString(i+1));
             buttPanel.add(buttons[i]);
         }
         drawPanel = new DrawPanel();
-        frame.setSize(800, 600);
+        frame.setSize(1000, 600);
         frame.getContentPane().add(BorderLayout.EAST, list);
         frame.getContentPane().add(BorderLayout.CENTER, drawPanel);
         frame.getContentPane().add(BorderLayout.SOUTH, buttPanel);
-        frame.setVisible(true);
         
+        frame.setVisible(true);
     }
     
     public void setWindowListener(WindowListener wl){
@@ -74,10 +74,6 @@ public class View {
         frame.repaint();
     }
     
-    public void declareWinner(){
-        
-    }
-    
     public class DrawPanel extends JPanel {
         
         @Override
@@ -107,11 +103,7 @@ public class View {
             }
         }
     }
-    
     public void paint(){
         drawPanel.repaint();
     }
-    
 }
-
-

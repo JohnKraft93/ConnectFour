@@ -29,6 +29,7 @@ public class Controller {
         try { 
             while(true) {
                 response = inn.readLine();
+                System.out.println(response);
                 if(response.startsWith("BEGIN")){
                     System.out.println(response);
                     String player = response.substring(6);
@@ -61,19 +62,20 @@ public class Controller {
                     view.disableButtonActionListeners();
                     view.addListData("Player " + response.substring(7) + " WON!");
                 } else if (response.startsWith("MESS")){
+                    System.out.println("hello there");
                     view.addListData(response.substring(5));
                 }
             }
         } catch (IOException e) {}
-
     }
     
     public class ButtonActionListeners implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println("client> send request to server: " + e.getActionCommand());
-            out.println("MOVE " + e.getActionCommand());
-            out.flush(); 
+            out.println("MOVE " + Integer.toString(Integer.parseInt(e.getActionCommand())-1));
+            out.flush();
+            out.flush();
         }
     }
 }
