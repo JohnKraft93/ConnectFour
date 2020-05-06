@@ -12,6 +12,7 @@ class ClientHandler extends Thread {
     private Model model;
     private ClientHandler opponent;
     private String player;
+    private boolean opponentStatus = false;
     
     public ClientHandler(Socket conn, String player, Model model){
         this.conn = conn;
@@ -65,6 +66,7 @@ class ClientHandler extends Thread {
         
         out.println("BEGIN " + player);
         out.flush();
+        opponentStatus  = true;
         messageConnection();
         bothConnected();
     }
@@ -86,16 +88,22 @@ class ClientHandler extends Thread {
     }
     
     public void opponentQuit(){
+        opponentStatus = false;
         out.println("MESS " + "Your opponent got scared and quit.");
         out.println("MESS " + "THEREFORE, YOU WIN");
         out.println("MESS " + "Quit and rejoin the server to play again!");
-        out.flush();
-        out.flush();
-        out.flush();
+        out.println("EXITING " + "You will be disconnected in 5 seconds.");
+        for(int i = 0; i < 4; i++){
+            out.flush();
+        }
+    }
+    
+    public void Winner(){
+        
     }
      
     public void bothConnected() {
-        while(true){
+        while(opponentStatus){
             Thread.yield();
             if(this == model.getCurrentPlayer()){
                 informTurn();
@@ -117,17 +125,26 @@ class ClientHandler extends Thread {
                                 System.out.println(win);
                                 if(win){
                                     out.println("WINNER " + player);
+                                    out.println("EXITING " + "You will be disconnected in 5 seconds.");
+                                    out.println("MESS " + "Quit and rejoin the server to play again!");
+                                    out.flush();
+                                    out.flush();
                                     out.flush();
                                     opponent.out.println("WINNER " + player);
-                                    out.flush();
+                                    opponent.out.println("EXITING " + "You will be disconnected in 5 seconds.");
+                                    opponent.out.println("MESS " + "Quit and rejoin the server to play again!");
+                                    opponent.out.flush();
+                                    opponent.out.flush();
+                                    opponent.out.flush();
+                                    
                                 }
                             }
                         } else if(pos.startsWith("EXIT")){
                             break;
                         }
-                    } 
+                    } else {break;}
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    System.out.println("RUNNING FAILURE");
                     break;
                 }
             }

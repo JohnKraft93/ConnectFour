@@ -1,6 +1,8 @@
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Controller {
     private PrintWriter out;
@@ -62,8 +64,16 @@ public class Controller {
                     view.disableButtonActionListeners();
                     view.addListData("Player " + response.substring(7) + " WON!");
                 } else if (response.startsWith("MESS")){
-                    System.out.println("hello there");
                     view.addListData(response.substring(5));
+                } else if(response.startsWith("EXITING")){
+                    view.addListData(response.substring(8));
+                    try {
+                        Thread.sleep(5000);
+                        out.close();
+                        inn.close();
+                        clientSocket.close();
+                        System.exit(0);
+                    } catch (InterruptedException ex) {}
                 }
             }
         } catch (IOException e) {}

@@ -11,7 +11,7 @@ public class server {
         try {
             ServerSocket server = new ServerSocket(5000);
             while(true){
-                System.out.println("hlell");
+                System.out.println("rgdgvsdvsdv");
                 model = new Model();
                 player1 = new ClientHandler(server.accept(), "1", model);
                 player1.start();
@@ -23,10 +23,12 @@ public class server {
                 try {
                     player1.join();
                     player2.join();
-                } catch (InterruptedException ex) {}
+                } catch (InterruptedException ex) {
+                    System.out.println("JOIN FAIL");
+                }
             }            
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("OTHER FAILURE");
         }
     }
 }
