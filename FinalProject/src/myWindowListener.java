@@ -46,4 +46,3 @@ public class myWindowListener implements WindowListener {
     @Override
     public void windowDeactivated(WindowEvent e) {} 
 }
-

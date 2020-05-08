@@ -2,16 +2,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 public class server {
-
     public static void main(String[] args) {
-        int conns = 0;
         Model model;
         ClientHandler player1, player2;
         
         try {
             ServerSocket server = new ServerSocket(5000);
             while(true){
-                System.out.println("rgdgvsdvsdv");
                 model = new Model();
                 player1 = new ClientHandler(server.accept(), "1", model);
                 player1.start();

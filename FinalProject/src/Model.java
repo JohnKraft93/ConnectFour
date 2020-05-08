@@ -33,6 +33,19 @@ public class Model {
         return -1;
     }
     
+    public boolean CheckforFullBoard(){
+        System.out.println("CEHCKING FULL");
+        int count = 0;
+        for(int i = 0; i < maxRow; i++){
+            for(int j = 0; j < maxCol; j++){
+                if(grid[i][j] != 0){
+                    count++;
+                }
+            }
+        }
+        return (count == 42);
+    }
+    
     public boolean CheckforWinner(ClientHandler player, int row, int col) {
         int count = 0;
         
@@ -76,7 +89,6 @@ public class Model {
                 }
             }
         }
-        
         return false;
     }
 }

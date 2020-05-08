@@ -9,8 +9,8 @@ public class View {
     private final JButton buttons[];
     private final int numOfButtons = 7;
     private final JPanel buttPanel;
-    public Integer board[][];
-    private final JList list;
+    private final Integer board[][];
+    private JList list;
     private final DefaultListModel listModel;
     private final DrawPanel drawPanel;
     
@@ -67,6 +67,8 @@ public class View {
     
     public void addListData(String item){
         listModel.addElement(item);
+        list = new JList(listModel);
+        frame.repaint();
     }
     
     public void setTitle(String s){

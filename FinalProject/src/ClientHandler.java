@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,10 +22,6 @@ class ClientHandler extends Thread {
             reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             out = new PrintWriter(conn.getOutputStream(), true);
         } catch (IOException e){}
-        
-        out.println("MESS " + conn);
-        out.flush();
-        out.flush();
     }
     
     public void setOpponent(ClientHandler op){
@@ -88,7 +83,6 @@ class ClientHandler extends Thread {
     }
     
     public void opponentQuit(){
-        opponentStatus = false;
         out.println("MESS " + "Your opponent got scared and quit.");
         out.println("MESS " + "THEREFORE, YOU WIN");
         out.println("MESS " + "Quit and rejoin the server to play again!");
@@ -96,12 +90,27 @@ class ClientHandler extends Thread {
         for(int i = 0; i < 4; i++){
             out.flush();
         }
+        opponentStatus = false;
     }
     
     public void Winner(){
-        
+        out.println("WINNER " + model.getCurrentPlayer().opponent.getPlayer());
+        out.println("EXITING " + "You will be disconnected in 5 seconds.");
+        out.println("MESS " + "Quit and rejoin the server to play again!");
+        for(int i = 0; i < 3; i++){
+            out.flush();
+        }
     }
-     
+    
+    public void tie(){
+        out.println("MESS " + "You Tied");
+        out.println("MESS " + "Quit and rejoin the server to play again!");
+        out.println("EXITING " + "You will be disconnected in 5 seconds.");
+        for(int i = 0; i < 3; i++){
+            out.flush();
+        }
+    }
+    
     public void bothConnected() {
         while(opponentStatus){
             Thread.yield();
@@ -110,33 +119,22 @@ class ClientHandler extends Thread {
                 String pos;
                 try {
                     if((pos = reader.readLine()) != null) {
-                        System.out.println(pos);
                         if(pos.startsWith("MOVE")){
                             int col = Integer.parseInt(pos.substring(5));
-                            System.out.println(col);
                             int row;
                             if((row = model.validMove(this, col)) != -1) {
                                 model.getCurrentPlayer().OpponentMoved(col, row);
-                                out.println("VALID " + row + col + player);
-                                out.flush();
-
-                                System.out.println("through");
+                                this.out.println("VALID " + row + col + player);
+                                this.out.flush();
                                 Boolean win = model.CheckforWinner(this, row, col);
-                                System.out.println(win);
                                 if(win){
-                                    out.println("WINNER " + player);
-                                    out.println("EXITING " + "You will be disconnected in 5 seconds.");
-                                    out.println("MESS " + "Quit and rejoin the server to play again!");
-                                    out.flush();
-                                    out.flush();
-                                    out.flush();
-                                    opponent.out.println("WINNER " + player);
-                                    opponent.out.println("EXITING " + "You will be disconnected in 5 seconds.");
-                                    opponent.out.println("MESS " + "Quit and rejoin the server to play again!");
-                                    opponent.out.flush();
-                                    opponent.out.flush();
-                                    opponent.out.flush();
-                                    
+                                    this.Winner();
+                                    this.opponent.Winner();
+                                }
+                                if(model.CheckforFullBoard()){
+                                    System.out.println("FULL BOARD");
+                                    this.tie();
+                                    this.opponent.tie();
                                 }
                             }
                         } else if(pos.startsWith("EXIT")){
@@ -144,12 +142,11 @@ class ClientHandler extends Thread {
                         }
                     } else {break;}
                 } catch (IOException ex) {
-                    System.out.println("RUNNING FAILURE");
                     break;
                 }
             }
         }
         System.out.println("Player " + player + " Exited.");
-        opponent.opponentQuit();
+        this.opponent.opponentQuit();
     }
 }

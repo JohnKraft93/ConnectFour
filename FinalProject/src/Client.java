@@ -4,4 +4,4 @@ public class Client {
     private void go() {
         controller = new Controller();
     }
-}   
+}
